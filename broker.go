@@ -12,6 +12,7 @@ import (
 const (
 	ADD    MessageType = "add"
 	DELETE MessageType = "delete"
+	UPDATE MessageType = "update"
 )
 
 type MessageType string
