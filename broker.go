@@ -49,7 +49,7 @@ func (m *MsgBroker) RegisterConsumer() (<-chan amqp.Delivery, error) {
 	msg, err := m.channel.Consume(
 		m.queue.Name, // queue
 		"",           // consumer
-		true,         // auto-ack
+		false,        // auto-ack
 		false,        // exclusive
 		false,        // no-local
 		false,        // no-wait
@@ -61,7 +61,7 @@ func (m *MsgBroker) RegisterConsumer() (<-chan amqp.Delivery, error) {
 	return msg, nil
 }
 
-func (m *MsgBroker) PublishMsg(data []byte, msgType MessageType) error {
+func (m *MsgBroker) PublishMsg(data []byte, msgType MessageType, dstSrv string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -74,6 +74,7 @@ func (m *MsgBroker) PublishMsg(data []byte, msgType MessageType) error {
 			ContentType: "application/json",
 			Type:        string(msgType),
 			Body:        data,
+			AppId:       dstSrv,
 		})
 	if err != nil {
 		return fmt.Errorf("%s: %w", "Failed to publish a message", err)
