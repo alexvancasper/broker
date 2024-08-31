@@ -51,7 +51,7 @@ func (m *MsgBroker) RegisterConsumer() (<-chan amqp.Delivery, error) {
 	msg, err := m.channel.Consume(
 		m.queue.Name, // queue
 		"",           // consumer
-		false,        // auto-ack
+		true,         // auto-ack
 		false,        // exclusive
 		false,        // no-local
 		false,        // no-wait
