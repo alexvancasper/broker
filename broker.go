@@ -23,7 +23,7 @@ type MsgBroker struct {
 	queue   amqp.Queue
 }
 
-func MsgBrokerInit(connStr, queueName string) (*MsgBroker, error) {
+func MsgBrokerInit(connStr string, queuesName []string) (*MsgBroker, error) {
 	var msg MsgBroker
 	var err error
 	err = msg.connect(connStr)
@@ -34,9 +34,11 @@ func MsgBrokerInit(connStr, queueName string) (*MsgBroker, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = msg.queueDeclare(queueName)
-	if err != nil {
-		return nil, err
+	for _, queue := range queuesName {
+		err = msg.queueDeclare(queue)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &msg, nil
 }
@@ -61,15 +63,15 @@ func (m *MsgBroker) RegisterConsumer() (<-chan amqp.Delivery, error) {
 	return msg, nil
 }
 
-func (m *MsgBroker) PublishMsg(data []byte, msgType MessageType, dstSrv string) error {
+func (m *MsgBroker) PublishMsg(data []byte, msgType MessageType, queueName, dstSrv string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	err := m.channel.PublishWithContext(ctx,
-		"",           // exchange
-		m.queue.Name, // routing key
-		false,        // mandatory
-		false,        // immediate
+		"",        // exchange
+		queueName, // routing key
+		false,     // mandatory
+		false,     // immediate
 		amqp.Publishing{
 			ContentType: "application/json",
 			Type:        string(msgType),
