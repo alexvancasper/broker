@@ -13,6 +13,8 @@ const (
 	ADD    MessageType = "add"
 	DELETE MessageType = "delete"
 	UPDATE MessageType = "update"
+	PAUSE  MessageType = "pause"
+	RESUME MessageType = "resume"
 )
 
 type MessageType string
